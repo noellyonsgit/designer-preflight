@@ -54,6 +54,7 @@ export function detectStack(root) {
   else if (has('react-scripts')) framework = { id: 'cra', name: 'Create React App' }
   else if (has('vite')) framework = { id: 'vite', name: 'Vite' }
   else if (has('react')) framework = { id: 'react', name: 'React' }
+  else if (has('electron')) framework = { id: 'electron', name: 'Electron' }
   else if (pkg && !fs.existsSync(path.join(root, 'index.html'))) framework = { id: 'node', name: 'Node.js' }
 
   const backends = []

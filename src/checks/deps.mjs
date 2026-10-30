@@ -83,13 +83,37 @@ function lockPackages(root, stack) {
 async function npmAudit(ctx) {
   const { root, stack } = ctx
   if (!stack.lockfiles.some((f) => f === 'package-lock.json' || f === 'npm-shrinkwrap.json')) return null
-  const res = await exec('npm', ['audit', '--json', '--package-lock-only'], { cwd: root, timeoutMs: 120_000 })
-  try {
-    const data = JSON.parse(res.out.slice(res.out.indexOf('{')))
-    if (data.error) return null
-    return data
-  } catch {
-    return null
+  let last
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await exec('npm', ['audit', '--json', '--package-lock-only'], { cwd: root, timeoutMs: 120_000 })
+      const start = res.out.indexOf('{')
+      if (start < 0) throw new Error('npm audit returned nothing. The advisory database may have been unreachable.')
+      const data = JSON.parse(res.out.slice(start))
+      if (data.error) throw new Error(data.error.summary || data.error.message || 'npm audit could not reach the advisory database')
+      return data
+    } catch (err) {
+      last = err
+      if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 700 * (attempt + 1)))
+    }
+  }
+  throw last
+}
+
+function auditUnavailable(err) {
+  return {
+    id: 'deps.audit-unavailable',
+    phase: 'security',
+    severity: 'P1',
+    confidence: 'verified',
+    file: 'package.json',
+    what: 'Packages could not be checked for known security problems.',
+    why: 'The vulnerability database could not be reached, so a serious hole in a package would not appear here. "Ready to share" is incomplete until this check succeeds.',
+    fix: 'Run the check again when you are online. Nothing in the project needs to change for this one.',
+    effort: '5 min',
+    evidence: String(err?.message || err).slice(0, 300),
+    evidenceKey: 'audit-unavailable',
+    source: ['npm audit', 'GitHub Advisory Database (CC-BY-4.0)', 'OSV.dev'],
   }
 }
 
@@ -326,6 +350,7 @@ export async function run(ctx) {
     return findings
   }
   let audited = false
+  let auditError = null
   try {
     const audit = await npmAudit(ctx)
     if (audit) {
@@ -333,6 +358,7 @@ export async function run(ctx) {
       audited = true
     }
   } catch (err) {
+    auditError = err
     ctx.log(`npm audit failed: ${err.message}`)
   }
   if (!audited) {
@@ -342,8 +368,10 @@ export async function run(ctx) {
         findings.push(...(await osvFindings(ctx, packages)))
         ctx.log(`OSV checked ${packages.length} packages`)
       } catch (err) {
-        ctx.notChecked.push(`Known vulnerabilities: OSV.dev could not be reached (${err.message}).`)
+        findings.push(auditUnavailable(auditError || err))
       }
+    } else if (auditError) {
+      findings.push(auditUnavailable(auditError))
     } else {
       ctx.notChecked.push('Known vulnerabilities: no lockfile or installed packages to check.')
     }

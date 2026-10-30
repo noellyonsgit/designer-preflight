@@ -80,13 +80,22 @@ export function localBin(root, name) {
 }
 
 export async function fetchJson(url, options = {}, timeoutMs = 20_000) {
-  const res = await fetch(url, { ...options, signal: AbortSignal.timeout(timeoutMs) })
-  if (!res.ok) {
-    const err = new Error(`${res.status} ${res.statusText} from ${url}`)
-    err.status = res.status
-    throw err
+  let last
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch(url, { ...options, signal: AbortSignal.timeout(timeoutMs) })
+      if (res.ok) return res.json()
+      const err = new Error(`${res.status} ${res.statusText} from ${url}`)
+      err.status = res.status
+      if (res.status !== 429 && res.status < 500) throw err
+      last = err
+    } catch (err) {
+      if (err.status && err.status !== 429 && err.status < 500) throw err
+      last = err
+    }
+    if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 700 * (attempt + 1)))
   }
-  return res.json()
+  throw last
 }
 
 export async function mapLimit(items, limit, fn) {

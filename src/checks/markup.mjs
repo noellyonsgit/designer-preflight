@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { excerpt } from '../files.mjs'
+import { excerpt, lineOf } from '../files.mjs'
 
 export const name = 'markup'
 export const phases = ['standards', 'devices', 'performance']
@@ -28,6 +28,24 @@ function grouped(hits, partial) {
         .replace(/\{([^{}|]*)\|([^{}|]*)\}/g, (_, one, many) => (hits.length === 1 ? one : many)),
     }),
   ]
+}
+
+const FIELD_SELECTOR = /(?:^|[\s,>+~])(?:input|select|textarea)\b|\.[\w-]*-(?:input|select|textarea)\b/
+const SMALL_TEXT = /font-size\s*:\s*(?:(?:1[0-5]|[0-9])px|0?\.\d+rem)/
+
+/** Font size on a real field rule. Matching "select" inside user-select or --input-border pointed at the wrong lines. */
+function smallFieldRules(project) {
+  const hits = []
+  for (const file of project.matching(/\.(css|scss|sass|less)$/)) {
+    const text = project.text(file) || ''
+    for (const rule of text.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (!FIELD_SELECTOR.test(rule[1]) || !SMALL_TEXT.test(rule[2])) continue
+      const size = rule[2].match(SMALL_TEXT)
+      const index = rule.index + rule[1].length + 1 + size.index
+      hits.push({ file, line: lineOf(text, index), text, index, match: size[0] })
+    }
+  }
+  return hits
 }
 
 function documentFiles(project, stack) {
@@ -84,8 +102,7 @@ export async function run(ctx) {
     findings.push(...grouped(vh, { id: 'markup.100vh', phase: 'devices', what: 'Full-height sections use 100vh ({n} place(s)).', why: 'On phones, 100vh is taller than the visible screen because it ignores the browser\'s address bar. Bottom content and buttons get cut off, and layouts jump as the bar shows and hides (Safari on iPhone and Chrome on Android).', fix: 'Use 100dvh (or 100svh for things that must always fit), or Tailwind h-dvh / min-h-svh.', source: ['web-features: viewport-unit-variants'] }))
   }
 
-  const smallInputs = []
-  for (const hit of project.grep(/\.(css|scss|sass|less)$/, /(input|select|textarea)[^{]*\{[^}]*font-size\s*:\s*(1[0-5]|[0-9])px/, { limit: 10 })) smallInputs.push(hit)
+  const smallInputs = [...smallFieldRules(project)]
   for (const hit of project.grep(/\.(jsx|tsx|vue|svelte|astro|html?)$/, /<(input|select|textarea)\b[^>]*\b(text-xs|text-sm|text-\[1[0-5]px\])/, { limit: 10 })) smallInputs.push(hit)
   findings.push(...grouped(smallInputs, { id: 'markup.input-zoom', phase: 'devices', what: 'Form fields use text smaller than 16px ({n} place(s)).', why: 'Safari on iPhone zooms the whole page in when someone taps a field with text under 16px, and does not zoom back out. The layout looks broken mid-form.', fix: 'Use at least 16px (text-base) for inputs, selects and text areas on small screens. Do not block zoom to hide this.', effort: '5 min', source: ['safari-webkit-skill (MIT)'] }))
 
