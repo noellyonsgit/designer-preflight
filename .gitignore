@@ -1,0 +1,9 @@
+node_modules
+.DS_Store
+.env
+.env.*
+!.env.example
+fixtures/*/node_modules
+fixtures/*/.preflight
+fixtures/*/dist
+fixtures/*/.next

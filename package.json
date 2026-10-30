@@ -1,0 +1,53 @@
+{
+  "name": "designer-preflight",
+  "version": "0.1.0",
+  "description": "Designer Preflight: pre-flight checks for vibe-coded apps and websites, explained for designers.",
+  "keywords": [
+    "designer",
+    "vibe-coding",
+    "accessibility",
+    "security",
+    "agent-skill",
+    "claude-code",
+    "codex",
+    "cursor",
+    "flowmap"
+  ],
+  "homepage": "https://github.com/noellyonsgit/designer-preflight#readme",
+  "bugs": {
+    "url": "https://github.com/noellyonsgit/designer-preflight/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noellyonsgit/designer-preflight.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "preflight": "src/cli.mjs"
+  },
+  "files": [
+    "src",
+    "schema",
+    "skill",
+    "scripts",
+    "LICENSE",
+    "NOTICE",
+    "CREDITS.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "install-skill": "node scripts/install-skill.mjs"
+  },
+  "dependencies": {
+    "axe-core": "^4.11.0",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0",
+    "puppeteer-core": "^24.15.0",
+    "web-features": "^3.0.0"
+  }
+}

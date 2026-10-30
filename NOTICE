@@ -1,0 +1,64 @@
+Designer Preflight
+Copyright (c) 2026 the Designer Preflight authors
+Licensed under the MIT License (see LICENSE).
+
+This project adapts wording, checklists or structure from the works below.
+Their licence notices are reproduced as their licences require. Ideas taken
+without copying any text are credited in CREDITS.md and not repeated here.
+
+--------------------------------------------------------------------------------
+vibe-code-cleanup (agentic-awesome-skills)
+https://github.com/sickn33/agentic-awesome-skills
+Copyright (c) sickn33 and contributors. MIT License.
+
+vibecoded-site-audit-skill
+https://github.com/sstanley-yelnatss/vibecoded-site-audit-skill
+Copyright (c) sstanley-yelnatss. MIT License.
+
+ai-kit (can-i-use skill)
+https://github.com/ivklgn/ai-kit
+Copyright (c) ivklgn. MIT License.
+
+safari-webkit-skill
+https://github.com/K8Cill/safari-webkit-skill
+Copyright (c) K8Cill. MIT License.
+
+Front-End-Checklist
+https://github.com/thedaviddias/Front-End-Checklist
+Copyright (c) David Dias. MIT License.
+
+vibe-building-skills (accessibility-excellence)
+https://github.com/sanky369/vibe-building-skills
+Copyright (c) sanky369. MIT License.
+
+The MIT License text for each of the above:
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+--------------------------------------------------------------------------------
+Agent Skills specification
+https://github.com/agentskills/agentskills
+Licensed under the Apache License, Version 2.0.
+http://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
+Third-party packages installed as dependencies keep their own licences:
+axe-core (MPL-2.0, unmodified, source at https://github.com/dequelabs/axe-core),
+puppeteer-core (Apache-2.0), web-features (Apache-2.0), pixelmatch (ISC),
+pngjs (MIT).

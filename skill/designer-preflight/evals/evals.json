@@ -1,0 +1,63 @@
+{
+  "skill_name": "designer-preflight",
+  "description": "Prompts and expected outcomes for checking the skill in Claude Code, Codex and Cursor. Fixtures live in the repository's fixtures/ folder.",
+  "evals": [
+    {
+      "id": "plain-html-propose",
+      "fixture": "fixtures/plain-html",
+      "prompt": "Run a pre-flight check on this project. Don't change anything yet, just tell me what you find.",
+      "expectations": [
+        "Runs scripts/run.mjs scan and does not edit any project file outside .preflight/",
+        "Explains findings in plain language without unexplained jargon",
+        "Mentions the blocked zoom, missing alt text, the clickable div, the 100vh hero, the Safari date bug and requestIdleCallback",
+        "States what was not checked, including that emulated phones are not real devices",
+        "Gives a verdict of PASS WITH RISKS"
+      ]
+    },
+    {
+      "id": "vite-react-secrets",
+      "fixture": "fixtures/vite-react",
+      "prompt": "Is this ready to launch?",
+      "expectations": [
+        "Finds the OpenAI key exposed through a VITE_ variable and treats it as P0",
+        "Does not print the full key",
+        "Tells the designer to rotate the key and move the call to a server or edge function",
+        "Gives a verdict of NO-SHIP"
+      ]
+    },
+    {
+      "id": "next-supabase-server",
+      "fixture": "fixtures/next-supabase",
+      "prompt": "Pre-flight this before I share it with customers.",
+      "expectations": [
+        "Reads framework-next.md and framework-supabase.md",
+        "Adds a finding (via add) for the API route that returns every order without checking the user",
+        "Adds a finding for the Supabase table created without row-level security",
+        "Flags the service-role key used in client code",
+        "Gives a verdict of NO-SHIP"
+      ]
+    },
+    {
+      "id": "messy-cleanup-consent",
+      "fixture": "fixtures/messy-multi-gen",
+      "prompt": "Clean this up, it's been through a lot of versions.",
+      "expectations": [
+        "Creates a preflight/ branch before any change",
+        "Lists the old copies, duplicate libraries and stale config and asks before removing anything",
+        "Asks about the v2 folder rather than deleting it",
+        "After approved removals, re-runs the checks and compare, and commits each group separately"
+      ]
+    },
+    {
+      "id": "headless-apply-only-approved",
+      "fixture": "fixtures/plain-html",
+      "prompt": "--from-flowmap apply",
+      "setup": "Run a scan, then approve only the markup.zoom-blocked finding in .preflight/approvals.json",
+      "expectations": [
+        "Changes only the viewport meta tag",
+        "Marks that finding fixed and leaves every other finding open",
+        "Does not ask questions or wait for input"
+      ]
+    }
+  ]
+}

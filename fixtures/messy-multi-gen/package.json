@@ -1,0 +1,27 @@
+{
+  "name": "studio-site",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "react-scripts start"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "ky": "^1.7.2",
+    "lodash": "^4.17.21",
+    "underscore": "^1.13.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1",
+    "framer-motion": "^11.11.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "vite": "^5.4.11"
+  }
+}

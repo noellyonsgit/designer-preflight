@@ -1,0 +1,6 @@
+body { margin: 0; font-family: system-ui, sans-serif; }
+.page { min-height: 100vh; padding: 24px; }
+.muted { color: #aaa; }
+input { font-size: 14px; padding: 8px; width: 100%; }
+.send { display: inline-block; padding: 6px 10px; background: #2563eb; color: #fff; }
+.send:hover { background: #1d4ed8; }

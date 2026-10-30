@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/noellyonsgit/designer-preflight/main/schema/findings.schema.json",
+  "title": "Designer Preflight findings",
+  "description": "Designer Preflight findings. Shared by the preflight CLI, the designer-preflight skill, and FlowMap. Lives at .preflight/findings.json in the checked project.",
+  "type": "object",
+  "required": ["version", "updatedAt", "findings"],
+  "properties": {
+    "version": { "const": 1 },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": ["id", "key", "phase", "severity", "confidence", "what", "why", "status", "origin"],
+      "properties": {
+        "id": { "type": "string", "description": "Check and rule, e.g. secrets.client-key" },
+        "key": { "type": "string", "description": "Stable fingerprint so a status survives re-scans" },
+        "phase": {
+          "enum": ["safety", "map", "health", "leftovers", "standards", "security", "devices", "performance", "states", "docs", "fixes"]
+        },
+        "severity": { "enum": ["P0", "P1", "P2"], "description": "P0 blocks launch, P1 fix before wide release, P2 polish" },
+        "confidence": { "enum": ["verified", "needs-human", "human-only"] },
+        "screen": { "type": "string", "description": "Route the finding shows up on, when known" },
+        "screens": { "type": "array", "items": { "type": "string" }, "description": "Every route the finding shows up on, when it affects more than one" },
+        "file": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 },
+        "what": { "type": "string", "description": "What is wrong, in one sentence" },
+        "why": { "type": "string", "description": "Why it matters, in plain language" },
+        "fix": { "type": "string" },
+        "effort": { "enum": ["5 min", "30 min", "half a day", "1 day+"] },
+        "evidence": { "type": "string", "description": "Short excerpt or tool output, secrets redacted" },
+        "status": { "enum": ["open", "approved", "fixed", "accepted-risk"] },
+        "note": { "type": "string", "description": "Why a risk was accepted, or what the fix commit was" },
+        "origin": { "enum": ["cli", "agent"] },
+        "source": { "type": "array", "items": { "type": "string" }, "description": "Credits for the rule or data, see CREDITS.md" }
+      }
+    }
+  }
+}
