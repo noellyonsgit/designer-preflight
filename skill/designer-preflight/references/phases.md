@@ -47,7 +47,7 @@ Each phase lists what it is for (in plain words), what the automatic checks alre
 
 **For the designer:** "Checking that people using keyboards, screen readers, zoom or larger text can use the site, and that it follows the framework's own rules."
 
-- Automatic: axe-core on every screen at desktop and phone size, `lang`, titles, alt text, clickable non-buttons, removed focus outlines, positive tabindex, reduced motion and headings.
+- Automatic: axe-core on every screen at desktop and phone size, a desktop Tab walk (focus covered by sticky bars, keyboard traps, long focus-order jumps), `lang`, titles, alt text, clickable non-buttons, removed focus outlines, positive tabindex, reduced motion and headings.
 - You: the manual checklist in `accessibility.md` (keyboard walk-through, modals, menus, forms, error messages, motion), plus the framework conventions in the matching `framework-*.md`.
 - Done when: no open P1 accessibility findings, or each is approved for fixing or consciously accepted.
 

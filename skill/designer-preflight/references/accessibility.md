@@ -1,6 +1,8 @@
 # Accessibility: the manual pass
 
-axe-core runs on every screen automatically, but automated tools catch only part of real problems (estimates range from about a third to about half). They cannot tell whether the keyboard order makes sense, whether focus is visible enough, or whether a label is useful. An automatic pass is not proof the site is accessible: say so to the designer.
+axe-core runs on every screen automatically. A keyboard walk then presses Tab on the desktop page as it first loads. It flags a focused control that is completely covered (often a sticky header or fixed bar, WCAG 2.4.11) and a control that traps the keyboard (Tab, Shift+Tab and Escape all fail to leave it, and the page has other controls). It also notes a long jump in focus order for a person to check. The walk does not open menus or dialogs, and it stops after 40 controls.
+
+Automated checks still cannot tell whether the keyboard order is meaningful, whether a focus ring is clear enough, or whether a label is useful. An automatic pass is not proof the site is accessible: say so to the designer.
 
 The target is **WCAG 2.2 level AA**. For shops and services sold in the EU, the European Accessibility Act has applied since June 2025, so accessibility can be a legal requirement, not just good practice.
 
@@ -9,8 +11,8 @@ Prefer native HTML elements (`<button>`, `<a href>`, `<label>`, `<dialog>`, `<de
 ## Keyboard walk-through (read the code, and describe it to the designer)
 
 For the main journey, check that someone using only Tab, Shift+Tab, Enter, Space, the arrow keys and Esc can:
-- reach every link, button and field, in an order that matches the visual order;
-- **see where they are** at all times (a visible focus style with at least 3:1 contrast, not hidden behind sticky headers: WCAG 2.4.11);
+- reach every link, button and field, in an order that matches the visual order (the scan only flags a long jump; you decide if the order makes sense);
+- **see where they are** at all times (a visible focus style with at least 3:1 contrast). The scan already checks that focus is not completely covered by a sticky bar.
 - skip the navigation (a "Skip to content" link on sites with long headers);
 - open and close menus, drop-downs, accordions, tabs and carousels;
 - use modals. Focus moves into the modal, stays inside while it is open, Esc closes it, and focus returns to the button that opened it. The page behind is `inert`.

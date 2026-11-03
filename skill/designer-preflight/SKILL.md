@@ -90,7 +90,7 @@ Work through these in order. After each phase, briefly tell the designer what yo
 3. Do the review the tool cannot do, using the reference file for each phase. Add what you find with `add`:
    - **2. Health:** does the main journey actually work? Read the code for the primary action (sign up, checkout, contact form, generate). Is anything stubbed, faked or hard-coded?
    - **3. Leftovers from earlier versions** (`references/cruft.md`): duplicate components doing the same job, abandoned routes, dead feature flags, two ways of doing the same thing, out-of-date agent rule files.
-   - **4. Standards** (`references/accessibility.md`): keyboard use of menus, modals and custom controls; focus order; headings; forms; motion. Follow the framework's own conventions.
+   - **4. Standards** (`references/accessibility.md`): keyboard use of menus, modals and custom controls that start closed; whether a focus-order jump is meaningful; headings; forms; motion. The scan already tabs through each screen as it first loads. Follow the framework's own conventions.
    - **5. Security** (`references/security.md`): every API route and server action checks who is calling; database rules (Supabase RLS); payment webhooks are verified; AI endpoints have rate limits and spending caps; uploads are checked; user content is not inserted as raw HTML; cookie consent and privacy policy if there is tracking.
    - **6. Phones and browsers** (`references/mobile-quirks.md`): go through the quirk list against the code.
    - **7. Speed and search:** heavy images, fonts, third-party scripts, titles, descriptions, share images.

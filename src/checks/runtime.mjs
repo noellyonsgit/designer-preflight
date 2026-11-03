@@ -1,5 +1,6 @@
 import axe from 'axe-core'
 import { VIEWPORTS, discoverScreens, joinUrl, launchBrowser, setViewport, visit } from '../browser.mjs'
+import { judgeWalk, walkKeyboard } from './keyboard.mjs'
 import { ensureServer } from '../server.mjs'
 
 export const name = 'runtime'
@@ -149,7 +150,11 @@ export async function run(ctx) {
       if (!axeHits.has(id)) axeHits.set(id, [])
       return axeHits.get(id)
     }
-    const grouped = { overflow: [], targets: [], inputs: [], images: [], h1none: [], h1many: [], console: [], errors: [], failed: [], slow: [], shifty: [], status: [] }
+    const grouped = { overflow: [], targets: [], inputs: [], images: [], h1none: [], h1many: [], console: [], errors: [], failed: [], slow: [], shifty: [], status: [], obscured: [], traps: [], cycles: [], jumps: [] }
+    let keyboardChecked = 0
+    let keyboardFailed = false
+    const screenCount = (n) => (n === 1 ? '1 screen' : `${n} screens`)
+    const focusName = (stop) => stop.name || stop.key
 
     for (const screen of screens) {
       const started = Date.now()
@@ -186,6 +191,29 @@ export async function run(ctx) {
           if (events.errors.length) grouped.errors.push(...[...new Set(events.errors)].slice(0, 3).map((e) => `${screen.route}: ${e}`))
           if (events.console.length) grouped.console.push(...[...new Set(events.console)].slice(0, 3).map((e) => `${screen.route}: ${e}`))
           if (events.failed.length) grouped.failed.push(...[...new Set(events.failed)].slice(0, 4).map((e) => `${screen.route}: ${e}`))
+          try {
+            const judged = judgeWalk(await walkKeyboard(page))
+            keyboardChecked++
+            for (const stop of judged.obscured) {
+              grouped.obscured.push({
+                screen: screen.route,
+                line: stop.how === 'off-screen' ? `${screen.route}: "${focusName(stop)}" is off the screen when focused` : `${screen.route}: "${focusName(stop)}" is covered by ${stop.obscuredBy || 'other content'}`,
+              })
+            }
+            if (judged.trap) grouped.traps.push({ screen: screen.route, line: `${screen.route}: stuck on "${focusName(judged.trap)}"` })
+            if (judged.cycle) {
+              const names = judged.cycle.names.filter(Boolean).slice(0, 4).join(', ') || 'a few controls'
+              grouped.cycles.push({ screen: screen.route, line: `${screen.route}: Tab cycles on ${names} and Escape does not leave` })
+            }
+            for (const jump of judged.jumps) {
+              grouped.jumps.push({
+                screen: screen.route,
+                line: jump.kind === 'skip' ? `${screen.route}: after "${jump.from}", focus skips to "${jump.to}" past "${jump.nearer}"` : `${screen.route}: after "${jump.from}", focus jumps up to "${jump.to}"`,
+              })
+            }
+          } catch {
+            keyboardFailed = true
+          }
         }
         if (mobile) {
           if (facts.overflow > 1) grouped.overflow.push({ screen: screen.route, vp, detail: `${facts.overflow}px — ${facts.wide.slice(0, 3).join(', ')}` })
@@ -246,6 +274,23 @@ export async function run(ctx) {
     if (grouped.h1none.length && !axeHits.has('page-has-heading-one')) {
       findings.push({ id: 'runtime.no-h1', phase: 'standards', severity: 'P2', confidence: 'verified', screen: grouped.h1none[0], screens: grouped.h1none, what: `${grouped.h1none.length === 1 ? "1 screen has" : `${grouped.h1none.length} screens have`} no main heading (h1).`, why: 'Screen readers and search engines use the h1 to understand what each page is about.', fix: 'Give each page one h1 describing it. Style it however you like.', effort: '5 min', evidence: list(grouped.h1none), evidenceKey: 'h1none', source: ['preflight'] })
     }
+    const screensOf = (items) => [...new Set(items.map((item) => item.screen))]
+    if (grouped.obscured.length) {
+      const s = screensOf(grouped.obscured)
+      findings.push({ id: 'runtime.focus-obscured', phase: 'standards', severity: 'P1', confidence: 'verified', screen: s[0], screens: s, what: `On ${screenCount(s.length)}, tabbing lands on a control that is completely hidden.`, why: 'Someone using a keyboard cannot see which control they are on, so they cannot tell what Enter will do. A sticky header, a fixed bar, a banner, or a control placed off the screen is usually what is covering it.', fix: 'Add scroll-padding-top and scroll-padding-bottom on the page, at least as tall as the sticky bars (or scroll-margin on each control). Move controls that sit off the screen into view when they receive focus.', effort: '30 min', evidence: list(grouped.obscured.map((item) => item.line)), evidenceKey: 'focus-obscured', source: ['WCAG 2.2 SC 2.4.11'] })
+    }
+    if (grouped.traps.length) {
+      const s = screensOf(grouped.traps)
+      findings.push({ id: 'runtime.keyboard-trap', phase: 'standards', severity: 'P1', confidence: 'verified', screen: s[0], screens: s, what: `On ${screenCount(s.length)}, the keyboard gets stuck on one control.`, why: 'Tab, Shift+Tab and Escape all leave focus where it is, and the page has other controls. Someone who cannot use a mouse has no way to move on.', fix: 'Find the key handler that stops Tab and Escape, and let Tab leave the control. If this is a dialog, close it on Escape and move focus back to the button that opened it.', effort: '30 min', evidence: list(grouped.traps.map((item) => item.line)), evidenceKey: 'keyboard-trap', source: ['WCAG 2.2 SC 2.1.2'] })
+    }
+    if (grouped.cycles.length) {
+      const s = screensOf(grouped.cycles)
+      findings.push({ id: 'runtime.focus-cycle', phase: 'standards', severity: 'P2', confidence: 'needs-human', screen: s[0], screens: s, what: `On ${screenCount(s.length)}, Tab cycles inside a group of controls and Escape does not leave that group.`, why: 'This is sometimes a dialog that forgot an Escape key, and sometimes a trap that keeps people away from the rest of the page. A person needs to check which.', fix: 'If it is a dialog, close it on Escape and return focus to whatever opened it. If it is not, let Tab move out of the group.', effort: '30 min', evidence: list(grouped.cycles.map((item) => item.line)), evidenceKey: 'focus-cycle', source: ['WCAG 2.2 SC 2.1.2'] })
+    }
+    if (grouped.jumps.length) {
+      const s = screensOf(grouped.jumps)
+      findings.push({ id: 'runtime.focus-order', phase: 'standards', severity: 'P2', confidence: 'needs-human', screen: s[0], screens: s, what: `On ${screenCount(s.length)}, keyboard focus jumps to a control far from the one before it.`, why: 'People who tab expect focus to follow the page from top to bottom. A long jump often means the order in the code does not match the layout. Sometimes that order is intentional, so this needs a person to confirm.', fix: 'Put the controls in the same order in the markup as they appear on the page, and remove tabindex values above 0. If a jump is intentional, accept this finding.', effort: '30 min', evidence: list(grouped.jumps.map((item) => item.line)), evidenceKey: 'focus-order', source: ['WCAG 2.2 SC 2.4.3'] })
+    }
     if (grouped.h1many.length) {
       findings.push({ id: 'runtime.many-h1', phase: 'standards', severity: 'P2', confidence: 'needs-human', screen: grouped.h1many[0].split(' ')[0], what: `${grouped.h1many.length === 1 ? "1 screen has" : `${grouped.h1many.length} screens have`} more than one main heading (h1).`, why: 'More than one h1 makes it unclear what the page is about, for screen readers and search engines.', fix: 'Keep one h1 per page and make the others h2 (they can keep the same look).', effort: '5 min', evidence: list(grouped.h1many), evidenceKey: 'h1many', source: ['preflight'] })
     }
@@ -301,6 +346,8 @@ export async function run(ctx) {
     } else {
       ctx.notChecked.push('Security headers: only checked on a live site. Run again with --url https://your-site.com once it is published.')
     }
+    if (keyboardChecked) ctx.notChecked.push('Keyboard: Tab, Shift+Tab and Escape were tried on each screen as it first loads, up to 40 controls. This catches focus hidden under sticky bars and keys that get stuck. It does not open closed menus or dialogs, and a long jump in focus order still needs a person to decide if that order makes sense.')
+    if (keyboardFailed) ctx.notChecked.push(keyboardChecked ? 'Keyboard walk: it did not finish on at least one screen, so hidden focus and keyboard traps may be missing there.' : 'Keyboard walk: it did not complete, so focus hidden under sticky bars and keyboard traps were not checked.')
     ctx.notChecked.push('Signed-in screens: pages behind a login were seen as signed-out visitors see them.')
   } catch (err) {
     ctx.notChecked.push(`Pages in a real browser: the check stopped early (${String(err.message || err).split('\n')[0].slice(0, 200)}).`)

@@ -22,7 +22,7 @@ Then a report, sorted by what to do first. For each problem it tells you:
 
 - 🔐 **Security:** leaked API keys (OpenAI, Stripe, Supabase and others), secret keys given names that publish them in the website, Supabase tables anyone can read or change, packages with known security problems, and package names that don't exist.
 - 📱 **Phones:** Safari on iPhone and Chrome on Android. It catches pages that scroll sideways, form fields that make Safari zoom in, content cut off by `100vh`, buttons hidden by the iPhone home bar, and dates Safari can't read.
-- ♿ **Accessibility:** WCAG 2.2 AA, using axe-core. Missing image descriptions, low contrast, unlabelled buttons and fields, blocked zoom, and keyboard problems.
+- ♿ **Accessibility:** WCAG 2.2 AA, using axe-core, plus a keyboard walk. Missing image descriptions, low contrast, unlabelled buttons and fields, blocked zoom, focus hidden under sticky bars, and keys getting stuck.
 - 🧹 **Leftovers from earlier versions:** old copies, `v2` folders, duplicate libraries, competing configs, placeholder text, and near-identical brand colours.
 - 🌐 **Browser support:** modern CSS and JavaScript features that older iPhones and browsers don't support yet, checked against Baseline data.
 - ⚡ **Speed and sharing:** heavy images, slow main content, layout jumps, page titles, descriptions, share images, favicons and 404 pages.
@@ -102,7 +102,7 @@ Useful options: `--url` (check a running or live site), `--routes /,/pricing`, `
 
 Each finding has a stable `key`, a phase, a severity (P0 to fix before sharing, P1 to fix soon, P2 to tidy up), a confidence level and a status. Only the skill edits project code. The command and FlowMap only read the project and write `.preflight/`.
 
-**Checks** live in `src/checks/`: build, dependencies, secrets, leftovers, design drift, markup, browser support, and the Chrome runtime pass (axe-core, phone sizes, console and network errors, Core Web Vitals). Framework-specific guidance for Next.js, Vite + React, Vue, Svelte, Astro, static sites and Supabase is in `skill/designer-preflight/references/`.
+**Checks** live in `src/checks/`: build, dependencies, secrets, leftovers, design drift, markup, browser support, and the Chrome runtime pass (axe-core, a desktop Tab walk, phone sizes, console and network errors, Core Web Vitals). Framework-specific guidance for Next.js, Vite + React, Vue, Svelte, Astro, static sites and Supabase is in `skill/designer-preflight/references/`.
 
 **Install options:** `npm run install-skill -- --project <folder>` installs for one project only. `--copy` copies instead of linking. `--uninstall` removes it.
 
