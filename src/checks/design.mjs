@@ -1,4 +1,5 @@
 import { excerpt } from '../files.mjs'
+import { driftFindings } from './design-drift.mjs'
 
 export const name = 'design'
 export const phases = ['leftovers', 'security']
@@ -115,6 +116,10 @@ export async function run(ctx) {
       effort: 'half a day',
       evidence: unique.slice(0, 20).join(' '),
     }))
+  }
+  for (const partial of driftFindings(project, stack)) {
+    if (partial.id === 'design.colours-outside-tokens' && drifting && tokenFiles) continue
+    findings.push(f(partial))
   }
   if (arbitrary.length >= 15) {
     findings.push(f({

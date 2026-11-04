@@ -39,7 +39,7 @@ Each phase lists what it is for (in plain words), what the automatic checks alre
   - duplicate component names and libraries that do the same job;
   - several lockfiles, stale configs and out-of-date agent rule files;
   - placeholder content and debug logging;
-  - design drift: raw colours, one-off values, z-index and `!important` piles, extra breakpoints, fonts loaded twice.
+  - design drift: raw colours and pixel spacing that bypass existing tokens, components such as Button and PrimaryButton that share a variant, one-off values, z-index and `!important` piles, extra breakpoints, fonts loaded twice.
 - You: see `cruft.md`. Confirm with the designer before removing anything that might be intentional, such as a "v2" design they are still trying.
 - Done when: every leftover is removed (on the branch), kept on purpose, or recorded as accepted.
 

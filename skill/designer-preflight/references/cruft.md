@@ -15,11 +15,11 @@ Approach: surgery, not demolition. Only remove what you can prove is unused, rem
 
 - **Copies:** `Button-old.tsx`, `HeroCopy.jsx`, `page (2).tsx`, `v2/` folders, `backup/`, `legacy/` *(scanned)*.
 - **Orphans:** files nothing imports, and screens nothing links to *(scanned for files; FlowMap's "Other screens" lane shows screens)*.
-- **Doubles:** two libraries for the same job, such as two icon sets, two date libraries, or two animation libraries *(scanned)*; two components doing the same thing under different names (you need to read them); two styling systems (Tailwind plus CSS modules plus styled-components).
+- **Doubles:** two libraries for the same job, such as two icon sets, two date libraries, or two animation libraries *(scanned)*; two components with different names that are the same control, such as `Button` and `PrimaryButton` when both take a variant or size *(scanned)*; two components that do the same job under names the scan cannot line up (you need to read them); two styling systems (Tailwind plus CSS modules plus styled-components).
 - **Stale configuration:** several lockfiles, a `tailwind.config.js` under Tailwind v4, two ESLint configs, two bundlers *(scanned)*.
 - **Out-of-date agent rules:** `AGENTS.md`, `CLAUDE.md`, `.cursorrules` or `.cursor/rules` mentioning frameworks, folders or conventions that no longer exist *(partly scanned)*. Update them to match the project as it is.
 - **Debug leftovers:** `console.log`, commented-out blocks of code, `TODO` piles, test pages (`/test`, `/demo`, `/playground`), placeholder text and images *(partly scanned)*.
-- **Design drift:** raw hex colours instead of tokens, one-off pixel values, near-duplicate colours, a pile of z-index values and `!important`, extra breakpoints *(scanned)*.
+- **Design drift:** raw hex colours and pixel spacing inside components when tokens already exist, near-duplicate colours, one-off pixel values, a pile of z-index values and `!important`, extra breakpoints *(scanned)*.
 
 ## Proving something is unused
 

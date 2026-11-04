@@ -23,7 +23,7 @@ Then a report, sorted by what to do first. For each problem it tells you:
 - 🔐 **Security:** leaked API keys (OpenAI, Stripe, Supabase and others), secret keys given names that publish them in the website, Supabase tables anyone can read or change, packages with known security problems, and package names that don't exist.
 - 📱 **Phones:** Safari on iPhone and Chrome on Android. It catches pages that scroll sideways, form fields that make Safari zoom in, content cut off by `100vh`, buttons hidden by the iPhone home bar, and dates Safari can't read.
 - ♿ **Accessibility:** WCAG 2.2 AA, using axe-core, plus a keyboard walk. Missing image descriptions, low contrast, unlabelled buttons and fields, blocked zoom, focus hidden under sticky bars, and keys getting stuck.
-- 🧹 **Leftovers from earlier versions:** old copies, `v2` folders, duplicate libraries, competing configs, placeholder text, and near-identical brand colours.
+- 🧹 **Leftovers from earlier versions:** old copies, `v2` folders, duplicate libraries, competing configs, placeholder text, near-identical brand colours, and components rebuilt instead of reused.
 - 🌐 **Browser support:** modern CSS and JavaScript features that older iPhones and browsers don't support yet, checked against Baseline data.
 - ⚡ **Speed and sharing:** heavy images, slow main content, layout jumps, page titles, descriptions, share images, favicons and 404 pages.
 
